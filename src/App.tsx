@@ -778,7 +778,34 @@ const headerOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
     try {
       setMexcLoading(true);
       setMexcError(null);
-      const res = await axios.get("/api/mexc");
+      const [coinsRes, tickersRes] = await Promise.all([
+        axios.get("https://www.mexc.com/api/gateway/pmt/market/web/all/underlying/type?type=1"),
+        axios.get("https://www.mexc.com/api/gateway/pmt/market/web/underlying/tickers")
+      ]);
+      const coinsMap = new Map();
+      (coinsRes.data?.data || []).forEach((coin: any) => {
+        if (coin.st === 2) coinsMap.set(coin.id.toString(), coin);
+      });
+      const enrichedData: any[] = [];
+      (tickersRes.data?.data || []).forEach((ticker: any) => {
+        const coinId = ticker.id.toString();
+        if (coinsMap.has(coinId)) {
+          const coin = coinsMap.get(coinId);
+          const lastPrice = parseFloat(ticker.lp || "0");
+          const openPrice = parseFloat(ticker.op || "0");
+          enrichedData.push({
+            id: coin.cd || coin.id.toString(),
+            vn: coin.vn,
+            fn: coin.vn,
+            idu: `Pre-market trading for ${coin.vn}`,
+            volume: parseFloat(ticker.ra || "0"),
+            price: lastPrice,
+            priceChangePct: openPrice > 0 ? ((lastPrice - openPrice) / openPrice) * 100 : 0,
+          });
+        }
+      });
+      enrichedData.sort((a, b) => b.volume - a.volume);
+      const res = { data: { success: true, data: enrichedData.slice(0, 10) } };
       if (res.data.success) {
         setMexcData(res.data.data);
       } else {
