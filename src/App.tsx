@@ -778,10 +778,10 @@ const headerOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
     try {
       setMexcLoading(true);
       setMexcError(null);
+      const PROXY = "https://corsproxy.io/?url=";
       const [coinsRes, tickersRes] = await Promise.all([
-        axios.get("https://www.mexc.com/api/gateway/pmt/market/web/all/underlying/type?type=1"),
-        axios.get("https://www.mexc.com/api/gateway/pmt/market/web/underlying/tickers")
-      ]);
+        axios.get(PROXY + encodeURIComponent("https://www.mexc.com/api/gateway/pmt/market/web/all/underlying/type?type=1")),
+        axios.get(PROXY + encodeURIComponent("https://www.mexc.com/api/gateway/pmt/market/web/underlying/tickers"))
       const coinsMap = new Map();
       (coinsRes.data?.data || []).forEach((coin: any) => {
         if (coin.st === 2) coinsMap.set(coin.id.toString(), coin);
