@@ -1,0 +1,5 @@
+{
+  "name": "Crypto Premarket Dashboard",
+  "description": "A real-time dashboard for upcoming crypto tokens, premarket prices, and TGE date predictions using Polymarket data.",
+  "requestFramePermissions": []
+}
