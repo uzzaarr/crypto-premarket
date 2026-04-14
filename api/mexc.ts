@@ -1,14 +1,31 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+export const config = {
+  runtime: 'edge',
+};
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
+const knownData: Record<string, { fn: string; idu: string }> = {
+  "GENIUS": { fn: "Genius", idu: "Genius Terminal is the first private and final onchain terminal." },
+  "ST": { fn: "Sentio", idu: "Sentio is a unified Web3 observability and data platform." },
+  "BILL": { fn: "Billions", idu: "Billions is a secure identity platform." },
+  "BLEND": { fn: "Fluent", idu: "Fluent is the first blended execution network." },
+  "CHIP": { fn: "USD.AI", idu: "Fast, non-recourse liquidity against deployed GPUs." },
+  "CENT": { fn: "Incentiv", idu: "The Incentiv blockchain makes crypto easy and accessible." },
+  "TEA": { fn: "Tea", idu: "Tea is the permissionless network powering the future of open source." },
+  "SPACESOL": { fn: "Space", idu: "A decentralized prediction market platform built on Solana." },
+  "MEGA": { fn: "MegaETH", idu: "MegaETH is the first real-time blockchain." },
+  "MENTO": { fn: "MENTO", idu: "Mento is a decentralized multi-currency stable asset protocol." }
+};
+
+export default async function handler(req: Request): Promise<Response> {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET',
+  };
+
   try {
     const headers: Record<string, string> = {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
       'Accept': 'application/json, text/plain, */*',
       'Accept-Language': 'en-US,en;q=0.9',
-      'Accept-Encoding': 'gzip, deflate, br',
       'Origin': 'https://www.mexc.com',
       'Referer': 'https://www.mexc.com/markets/premarket',
       'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124"',
@@ -31,23 +48,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const [coinsData, tickersData] = await Promise.all([coinsRes.json(), tickersRes.json()]);
 
-    const coinsMap = new Map();
+    const coinsMap = new Map<string, any>();
     (coinsData?.data || []).forEach((coin: any) => {
       if (coin.st === 2) coinsMap.set(coin.id.toString(), coin);
     });
-
-    const knownData: Record<string, { fn: string; idu: string }> = {
-      "GENIUS": { fn: "Genius", idu: "Genius Terminal is the first private and final onchain terminal." },
-      "ST": { fn: "Sentio", idu: "Sentio is a unified Web3 observability and data platform." },
-      "BILL": { fn: "Billions", idu: "Billions is a secure identity platform." },
-      "BLEND": { fn: "Fluent", idu: "Fluent is the first blended execution network." },
-      "CHIP": { fn: "USD.AI", idu: "Fast, non-recourse liquidity against deployed GPUs." },
-      "CENT": { fn: "Incentiv", idu: "The Incentiv blockchain makes crypto easy and accessible." },
-      "TEA": { fn: "Tea", idu: "Tea is the permissionless network powering the future of open source." },
-      "SPACESOL": { fn: "Space", idu: "A decentralized prediction market platform built on Solana." },
-      "MEGA": { fn: "MegaETH", idu: "MegaETH is the first real-time blockchain." },
-      "MENTO": { fn: "MENTO", idu: "Mento is a decentralized multi-currency stable asset protocol." }
-    };
 
     const enrichedData: any[] = [];
     (tickersData?.data || []).forEach((ticker: any) => {
@@ -70,8 +74,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     enrichedData.sort((a, b) => b.volume - a.volume);
-    res.json({ success: true, data: enrichedData.slice(0, 10), count: enrichedData.length });
+    return Response.json(
+      { success: true, data: enrichedData.slice(0, 10), count: enrichedData.length },
+      { headers: corsHeaders }
+    );
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    return Response.json(
+      { success: false, error: error.message },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
