@@ -13,14 +13,10 @@
       }
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+  "rewrites": [
+    { "source": "/api/premarket", "destination": "/api/premarket.ts" },
+    { "source": "/api/hyperliquid", "destination": "/api/hyperliquid.ts" },
+    { "source": "/api/mexc", "destination": "/api/mexc.ts" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

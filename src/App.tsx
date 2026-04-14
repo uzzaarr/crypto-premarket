@@ -648,9 +648,16 @@ function InteractiveBackground() {
   const smoothY = useSpring(mouseY, springConfig);
 
   useEffect(() => {
+   let ticking = false;
     const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set((e.clientX / window.innerWidth) - 0.5);
-      mouseY.set((e.clientY / window.innerHeight) - 0.5);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          mouseX.set((e.clientX / window.innerWidth) - 0.5);
+          mouseY.set((e.clientY / window.innerHeight) - 0.5);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
