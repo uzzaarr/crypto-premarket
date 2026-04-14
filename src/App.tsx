@@ -521,25 +521,13 @@ export default function App() {
   };
 
   const fetchMexcData = async () => {
-    setMexcLoading(true); setMexcError(null);
     try {
-      // Try calling MEXC directly from the browser — bypasses Akamai WAF
-      // (server-side requests from any cloud IP are blocked with 403)
-      const [coinsRes, tickersRes] = await Promise.all([
-        axios.get('https://www.mexc.com/api/gateway/pmt/market/web/all/underlying/type?type=1', { withCredentials: true }),
-        axios.get('https://www.mexc.com/api/gateway/pmt/market/web/underlying/tickers', { withCredentials: true })
-      ]);
-      const result = processMexcResponse(coinsRes.data, tickersRes.data);
-      setMexcData(result);
-      setLastUpdated(new Date());
-    } catch {
-      // Fall back to server proxy
-      try {
-        const res = await axios.get("/api/mexc");
-        if (res.data.success) { setMexcData(res.data.data); setLastUpdated(new Date()); }
-        else throw new Error(res.data.error || "Failed to fetch MEXC data");
-      } catch (e2: any) { setMexcError(e2.message || "Failed to fetch MEXC data."); }
-    } finally { setMexcLoading(false); }
+      setMexcLoading(true); setMexcError(null);
+      const res = await axios.get("/api/mexc");
+      if (res.data.success) { setMexcData(res.data.data); setLastUpdated(new Date()); }
+      else throw new Error(res.data.error || "Failed to fetch MEXC data");
+    } catch (e: any) { setMexcError(e.message || "Failed to fetch MEXC data."); }
+    finally { setMexcLoading(false); }
   };
 
   useEffect(() => {
