@@ -733,9 +733,9 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   
   const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: containerRef });
-  const headerY = useTransform(scrollYProgress, [0, 0.2], [0, -50]);
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const { scrollYProgress } = useScroll({ target: containerRef, layoutEffect: false });
+const headerY = useTransform(scrollYProgress, [0, 0.2], [0, -50]);
+const headerOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   const fetchData = async () => {
     try {
