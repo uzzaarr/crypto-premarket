@@ -4,17 +4,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
   try {
-    const headers = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    const headers: Record<string, string> = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'Accept': 'application/json, text/plain, */*',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Origin': 'https://www.mexc.com',
+      'Referer': 'https://www.mexc.com/markets/premarket',
+      'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Windows"',
+      'sec-fetch-dest': 'empty',
+      'sec-fetch-mode': 'cors',
+      'sec-fetch-site': 'same-origin',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
     };
 
-    const coinsRes = await fetch('https://www.mexc.com/api/gateway/pmt/market/web/all/underlying/type?type=1', { headers });
-    if (!coinsRes.ok) throw new Error(`Coins API failed: ${coinsRes.status}`);
-    const coinsData = await coinsRes.json();
+    const [coinsRes, tickersRes] = await Promise.all([
+      fetch('https://www.mexc.com/api/gateway/pmt/market/web/all/underlying/type?type=1', { headers }),
+      fetch('https://www.mexc.com/api/gateway/pmt/market/web/underlying/tickers', { headers })
+    ]);
 
-    const tickersRes = await fetch('https://www.mexc.com/api/gateway/pmt/market/web/underlying/tickers', { headers });
+    if (!coinsRes.ok) throw new Error(`Coins API failed: ${coinsRes.status}`);
     if (!tickersRes.ok) throw new Error(`Tickers API failed: ${tickersRes.status}`);
-    const tickersData = await tickersRes.json();
+
+    const [coinsData, tickersData] = await Promise.all([coinsRes.json(), tickersRes.json()]);
 
     const coinsMap = new Map();
     (coinsData?.data || []).forEach((coin: any) => {
@@ -41,23 +56,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const coin = coinsMap.get(coinId);
         const lastPrice = parseFloat(ticker.lp || '0');
         const openPrice = parseFloat(ticker.op || '0');
-        const volume = parseFloat(ticker.ra || '0');
-        const priceChangePct = openPrice > 0 ? ((lastPrice - openPrice) / openPrice) * 100 : 0;
         const known = knownData[coin.vn] || { fn: coin.vn, idu: `Pre-market trading for ${coin.vn}.` };
         enrichedData.push({
           id: coin.cd || coin.id.toString(),
           vn: coin.vn,
           fn: known.fn,
           idu: known.idu,
-          volume,
+          volume: parseFloat(ticker.ra || '0'),
           price: lastPrice,
-          priceChangePct
+          priceChangePct: openPrice > 0 ? ((lastPrice - openPrice) / openPrice) * 100 : 0
         });
       }
     });
 
     enrichedData.sort((a, b) => b.volume - a.volume);
-    res.json({ success: true, data: enrichedData.slice(0, 10), count: Math.min(enrichedData.length, 10) });
+    res.json({ success: true, data: enrichedData.slice(0, 10), count: enrichedData.length });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }
