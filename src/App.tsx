@@ -57,6 +57,46 @@ interface MexcTokenData {
   priceChangePct: number;
 }
 
+const MEXC_KNOWN_DATA: Record<string, { fn: string; idu: string }> = {
+  "GENIUS": { fn: "Genius", idu: "Genius Terminal is the first private and final onchain terminal." },
+  "ST": { fn: "Sentio", idu: "Sentio is a unified Web3 observability and data platform." },
+  "BILL": { fn: "Billions", idu: "Billions is a secure identity platform." },
+  "BLEND": { fn: "Fluent", idu: "Fluent is the first blended execution network." },
+  "CHIP": { fn: "USD.AI", idu: "Fast, non-recourse liquidity against deployed GPUs." },
+  "CENT": { fn: "Incentiv", idu: "The Incentiv blockchain makes crypto easy and accessible." },
+  "TEA": { fn: "Tea", idu: "Tea is the permissionless network powering the future of open source." },
+  "SPACESOL": { fn: "Space", idu: "A decentralized prediction market platform built on Solana." },
+  "MEGA": { fn: "MegaETH", idu: "MegaETH is the first real-time blockchain." },
+  "MENTO": { fn: "MENTO", idu: "Mento is a decentralized multi-currency stable asset protocol." }
+};
+
+function processMexcResponse(coinsData: any, tickersData: any): MexcTokenData[] {
+  const coinsMap = new Map<string, any>();
+  (coinsData?.data || []).forEach((coin: any) => {
+    if (coin.st === 2) coinsMap.set(coin.id.toString(), coin);
+  });
+  const enriched: MexcTokenData[] = [];
+  (tickersData?.data || []).forEach((ticker: any) => {
+    const coinId = ticker.id.toString();
+    if (coinsMap.has(coinId)) {
+      const coin = coinsMap.get(coinId);
+      const lastPrice = parseFloat(ticker.lp || '0');
+      const openPrice = parseFloat(ticker.op || '0');
+      const known = MEXC_KNOWN_DATA[coin.vn] || { fn: coin.vn, idu: `Pre-market trading for ${coin.vn}.` };
+      enriched.push({
+        id: coin.cd || coin.id.toString(),
+        vn: coin.vn,
+        fn: known.fn,
+        idu: known.idu,
+        volume: parseFloat(ticker.ra || '0'),
+        price: lastPrice,
+        priceChangePct: openPrice > 0 ? ((lastPrice - openPrice) / openPrice) * 100 : 0
+      });
+    }
+  });
+  return enriched.sort((a, b) => b.volume - a.volume).slice(0, 10);
+}
+
 function formatCurrency(v: number) {
   if (!v) return "$0";
   if (v >= 1e9) return "$" + (v / 1e9).toFixed(1) + "B";
@@ -481,13 +521,25 @@ export default function App() {
   };
 
   const fetchMexcData = async () => {
+    setMexcLoading(true); setMexcError(null);
     try {
-      setMexcLoading(true); setMexcError(null);
-      const res = await axios.get("/api/mexc");
-      if (res.data.success) setMexcData(res.data.data);
-      else throw new Error(res.data.error || "Failed to fetch MEXC data");
-    } catch (e: any) { setMexcError(e.message || "Failed to fetch MEXC data."); }
-    finally { setMexcLoading(false); }
+      // Try calling MEXC directly from the browser — bypasses Akamai WAF
+      // (server-side requests from any cloud IP are blocked with 403)
+      const [coinsRes, tickersRes] = await Promise.all([
+        axios.get('https://www.mexc.com/api/gateway/pmt/market/web/all/underlying/type?type=1', { withCredentials: true }),
+        axios.get('https://www.mexc.com/api/gateway/pmt/market/web/underlying/tickers', { withCredentials: true })
+      ]);
+      const result = processMexcResponse(coinsRes.data, tickersRes.data);
+      setMexcData(result);
+      setLastUpdated(new Date());
+    } catch {
+      // Fall back to server proxy
+      try {
+        const res = await axios.get("/api/mexc");
+        if (res.data.success) { setMexcData(res.data.data); setLastUpdated(new Date()); }
+        else throw new Error(res.data.error || "Failed to fetch MEXC data");
+      } catch (e2: any) { setMexcError(e2.message || "Failed to fetch MEXC data."); }
+    } finally { setMexcLoading(false); }
   };
 
   useEffect(() => {
