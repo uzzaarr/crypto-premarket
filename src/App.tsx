@@ -675,7 +675,7 @@ export default function App() {
             <div className="flex flex-wrap justify-center md:justify-start items-center gap-8">
               <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#8b5cf6] transition-colors">Tracked Perps</div><div className="text-2xl font-black text-white">{hlData.length}</div></div>
               <div className="hidden md:block w-px h-8 bg-[#222]" />
-              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#8b5cf6] transition-colors">Total Volume</div><div className="text-2xl font-black text-white">{formatCurrency(hlData.reduce((acc, curr) => acc + curr.volume24h, 0))}</div></div>
+              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#8b5cf6] transition-colors">24H Volume</div><div className="text-2xl font-black text-white">{formatCurrency(hlData.reduce((acc, curr) => acc + curr.volume24h, 0))}</div></div>
             </div>
             <div className="flex items-center gap-6">
               {lastUpdated && <div className="text-[10px] text-gray-600 font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#8b5cf6] animate-pulse" />SYNCED {lastUpdated.toLocaleTimeString()}</div>}
@@ -702,8 +702,6 @@ export default function App() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 pb-8 border-b border-[#111]">
             <div className="flex flex-wrap justify-center md:justify-start items-center gap-8">
               <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#f59e0b] transition-colors">Tracked Tokens</div><div className="text-2xl font-black text-white">{filteredWhalesData.length}</div></div>
-              <div className="hidden md:block w-px h-8 bg-[#222]" />
-              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#f59e0b] transition-colors">Total Raised</div><div className="text-2xl font-black text-white">{formatCurrency(filteredWhalesData.reduce((a, t) => a + t.totalFundRaise, 0))}</div></div>
             </div>
             <div className="flex items-center gap-6">
               {lastUpdated && <div className="text-[10px] text-gray-600 font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] animate-pulse" />SYNCED {lastUpdated.toLocaleTimeString()}</div>}
