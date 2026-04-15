@@ -26,7 +26,6 @@ body {
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
+  -webkit-overflow-scrolling: touch; /* iOS momentum scroll */
+  scroll-behavior: smooth;
 }

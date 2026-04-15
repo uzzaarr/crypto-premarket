@@ -646,8 +646,8 @@ export default function App() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-12">
           {/* Tab strip — scrollable on mobile, normal row on desktop */}
-          <div className="-mx-6 md:mx-0 overflow-x-auto scrollbar-none">
-            <div className="flex gap-3 px-6 md:px-0 pb-1 md:pb-0 w-max md:w-auto">
+          <div className="-mx-4 md:mx-0 overflow-x-auto scrollbar-none">
+            <div className="flex gap-3 px-4 md:px-0 pb-1 md:pb-0 w-max md:w-auto" style={{ touchAction: 'pan-x' }}>
               <button onClick={() => setActiveTab('polymarket')} className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'polymarket' ? 'bg-[#00e5ff] text-black shadow-[0_0_20px_rgba(0,229,255,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Polymarket</button>
               <button onClick={() => setActiveTab('hyperliquid')} className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'hyperliquid' ? 'bg-[#8b5cf6] text-black shadow-[0_0_20px_rgba(139,92,246,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Hyperliquid</button>
               <button onClick={() => setActiveTab('whales')} className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'whales' ? 'bg-[#f59e0b] text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Whales Market</button>
