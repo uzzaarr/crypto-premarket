@@ -643,12 +643,15 @@ export default function App() {
       <div className="relative z-10 w-full">
         <HeroGeometric badge="Global Premarket Index" title1="PRE" title2="MARKET" />
       </div>
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pb-16 md:pb-24">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
-          <div className="flex justify-center gap-4">
-            <button onClick={() => setActiveTab('polymarket')} className={`px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'polymarket' ? 'bg-[#00e5ff] text-black shadow-[0_0_20px_rgba(0,229,255,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Polymarket</button>
-            <button onClick={() => setActiveTab('hyperliquid')} className={`px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'hyperliquid' ? 'bg-[#8b5cf6] text-black shadow-[0_0_20px_rgba(139,92,246,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Hyperliquid</button>
-            <button onClick={() => setActiveTab('whales')} className={`px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'whales' ? 'bg-[#f59e0b] text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Whales Market</button>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-12">
+          {/* Tab strip — scrollable on mobile, normal row on desktop */}
+          <div className="-mx-6 md:mx-0 overflow-x-auto scrollbar-none">
+            <div className="flex gap-3 px-6 md:px-0 pb-1 md:pb-0 w-max md:w-auto">
+              <button onClick={() => setActiveTab('polymarket')} className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'polymarket' ? 'bg-[#00e5ff] text-black shadow-[0_0_20px_rgba(0,229,255,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Polymarket</button>
+              <button onClick={() => setActiveTab('hyperliquid')} className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'hyperliquid' ? 'bg-[#8b5cf6] text-black shadow-[0_0_20px_rgba(139,92,246,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Hyperliquid</button>
+              <button onClick={() => setActiveTab('whales')} className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'whales' ? 'bg-[#f59e0b] text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Whales Market</button>
+            </div>
           </div>
           <div className="relative w-full md:w-72">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Search className="h-4 w-4 text-gray-500" /></div>
