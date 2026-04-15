@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { motion, AnimatePresence, useMotionValue, useSpring } from "motion/react";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "motion/react";
 import { HeroGeometric } from "./components/ui/shape-landing-hero";
 import { 
   RefreshCw, 
@@ -547,7 +547,6 @@ export default function App() {
           <div className="flex justify-center gap-4">
             <button onClick={() => setActiveTab('polymarket')} className={`px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'polymarket' ? 'bg-[#00e5ff] text-black shadow-[0_0_20px_rgba(0,229,255,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Polymarket</button>
             <button onClick={() => setActiveTab('hyperliquid')} className={`px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'hyperliquid' ? 'bg-[#8b5cf6] text-black shadow-[0_0_20px_rgba(139,92,246,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Hyperliquid</button>
-            <button onClick={() => setActiveTab('mexc')} className={`px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'mexc' ? 'bg-[#10b981] text-black shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>MEXC</button>
           </div>
           <div className="relative w-full md:w-72">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Search className="h-4 w-4 text-gray-500" /></div>
