@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import { Circle } from "lucide-react";
 import { cn } from "../../lib/utils";
 
@@ -41,25 +40,10 @@ function CryptoChartBackground() {
                         <stop stopColor="#00e5ff" stopOpacity="0.15" />
                         <stop offset="1" stopColor="#00e5ff" stopOpacity="0" />
                     </linearGradient>
-
-                    {/* One CSS keyframe for the whole volume-bar group — zero JS overhead */}
-                    <style>{`
-                        @keyframes bars-in {
-                            from { opacity: 0; transform: scaleY(0); transform-origin: bottom; }
-                            to   { opacity: 1; transform: scaleY(1); transform-origin: bottom; }
-                        }
-                        .vol-bars { animation: bars-in 1.2s ease-out forwards; }
-                        @keyframes fade-in {
-                            from { opacity: 0; }
-                            to   { opacity: 1; }
-                        }
-                        .area-fill  { animation: fade-in 2s ease-out 0.5s both; }
-                        .candles-g  { animation: fade-in 0.8s ease-out 1s both; }
-                    `}</style>
                 </defs>
 
-                {/* Volume bars — plain SVG, one CSS animation on the group */}
-                <g className="vol-bars opacity-20">
+                {/* Volume bars — static */}
+                <g opacity="0.2">
                     {volumeBars.map((bar, i) => (
                         <rect
                             key={i}
@@ -72,27 +56,22 @@ function CryptoChartBackground() {
                     ))}
                 </g>
 
-                {/* Area fill */}
+                {/* Area fill — static */}
                 <path
-                    className="area-fill"
                     d="M0 350 L 100 320 L 200 340 L 300 280 L 400 290 L 500 200 L 600 220 L 700 150 L 800 180 L 900 80 L 1000 100 L 1100 40 L 1200 20 L 1200 400 L 0 400 Z"
                     fill="url(#area-grad)"
-                    style={{ opacity: 0 }}
                 />
 
-                {/* Main line — keep pathLength animation (runs once, GPU-composited) */}
-                <motion.path
+                {/* Main line — static */}
+                <path
                     d="M0 350 L 100 320 L 200 340 L 300 280 L 400 290 L 500 200 L 600 220 L 700 150 L 800 180 L 900 80 L 1000 100 L 1100 40 L 1200 20"
                     stroke="url(#line-grad)"
                     strokeWidth="3"
                     fill="none"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 1 }}
-                    transition={{ duration: 2.5, ease: "easeInOut" }}
                 />
 
-                {/* Candlesticks — single fade-in on the group, no per-element motion */}
-                <g className="candles-g" style={{ opacity: 0 }}>
+                {/* Candlesticks — static */}
+                <g opacity="1">
                     {candlesticks.map((pt, i) => (
                         <g key={i}>
                             <line x1={pt.x} y1={pt.y - 15} x2={pt.x} y2={pt.y + 15}
@@ -117,19 +96,6 @@ function HeroGeometric({
     title1?: string;
     title2?: string;
 }) {
-    const fadeUpVariants = {
-        hidden: { opacity: 0, y: 30 },
-        visible: (i: number) => ({
-            opacity: 1,
-            y: 0,
-            transition: {
-                duration: 1,
-                delay: 0.5 + i * 0.2,
-                ease: [0.25, 0.4, 0.25, 1],
-            },
-        }),
-    };
-
     return (
         <div className="relative w-full flex items-center justify-center overflow-hidden pt-24 pb-12">
             <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/[0.02] via-transparent to-[#00e5ff]/[0.02]" />
@@ -138,39 +104,24 @@ function HeroGeometric({
 
             <div className="relative z-10 container mx-auto px-4 md:px-6">
                 <div className="max-w-3xl mx-auto text-center">
-                    <motion.div
-                        custom={0}
-                        variants={fadeUpVariants}
-                        initial="hidden"
-                        animate="visible"
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-8 md:mb-12"
-                    >
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-8 md:mb-12">
                         <Circle className="h-2 w-2 fill-[#00e5ff]/80 text-[#00e5ff]" />
                         <span className="text-sm text-white/60 tracking-wide">
                             {badge}
                         </span>
-                    </motion.div>
+                    </div>
 
-                    <motion.div
-                        custom={1}
-                        variants={fadeUpVariants}
-                        initial="hidden"
-                        animate="visible"
-                    >
-                        <h1 className="text-5xl sm:text-7xl md:text-8xl font-display font-bold mb-6 md:mb-8 tracking-tighter">
-                            <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80">
-                                {title1}
-                            </span>
-                            <br />
-                            <span className={cn("bg-clip-text text-transparent bg-gradient-to-r from-[#00e5ff] via-white/90 to-[#8b5cf6]")}>
-                                {title2}
-                            </span>
-                        </h1>
-                    </motion.div>
+                    <h1 className="text-5xl sm:text-7xl md:text-8xl font-display font-bold mb-6 md:mb-8 tracking-tighter">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80">
+                            {title1}
+                        </span>
+                        <br />
+                        <span className={cn("bg-clip-text text-transparent bg-gradient-to-r from-[#00e5ff] via-white/90 to-[#8b5cf6]")}>
+                            {title2}
+                        </span>
+                    </h1>
                 </div>
             </div>
-
-            <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-transparent pointer-events-none" />
         </div>
     );
 }
