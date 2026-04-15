@@ -22,6 +22,11 @@ body {
   box-sizing: border-box;
 }
 
+/* Scroll performance — isolate card grid from rest of layout */
+.card-grid {
+  contain: layout style;
+}
+
 /* Hide scrollbar on tab strip while keeping scroll functionality */
 .scrollbar-none {
   -ms-overflow-style: none;
