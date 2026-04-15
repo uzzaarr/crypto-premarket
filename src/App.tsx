@@ -641,7 +641,7 @@ export default function App() {
     <div className="min-h-screen bg-transparent text-[#f0f0f0] font-sans selection:bg-[#00e5ff]/30 overflow-x-hidden relative">
       <InteractiveBackground />
       <div className="relative z-10 w-full">
-        <HeroGeometric badge="Global Premarket Index" title1="PRE" title2="MARKET" />
+        <HeroGeometric badge="Premarket Aggregator" title1="PRE" title2="MARKET" />
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-12">
