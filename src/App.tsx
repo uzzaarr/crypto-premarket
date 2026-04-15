@@ -2,19 +2,21 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "motion/react";
 import { HeroGeometric } from "./components/ui/shape-landing-hero";
-import { 
-  RefreshCw, 
-  TrendingUp, 
-  Calendar, 
-  ExternalLink, 
-  Info, 
+import {
+  RefreshCw,
+  TrendingUp,
+  Calendar,
+  ExternalLink,
+  Info,
   Activity,
   BarChart3,
   X,
   Zap,
   Globe,
   Sparkles,
-  Search
+  Search,
+  ChevronDown,
+  Calculator as CalculatorIcon,
 } from "lucide-react";
 
 interface Market {
@@ -528,6 +530,205 @@ function WhalesCard({ token }: { token: WhalesTokenData }) {
   );
 }
 
+function Calculator({ data, hlData, whalesData }: { data: TokenData[]; hlData: HLTokenData[]; whalesData: WhalesTokenData[] }) {
+  const [platform, setPlatform] = useState<'hyperliquid' | 'whales' | 'polymarket' | ''>('');
+  const [selectedToken, setSelectedToken] = useState('');
+  const [tokenAmount, setTokenAmount] = useState('');
+  const [totalSupply, setTotalSupply] = useState('');
+  const [selectedFDVQuestion, setSelectedFDVQuestion] = useState('');
+
+  useEffect(() => { setSelectedToken(''); setTokenAmount(''); setTotalSupply(''); setSelectedFDVQuestion(''); }, [platform]);
+  useEffect(() => { setSelectedFDVQuestion(''); setTotalSupply(''); setTokenAmount(''); }, [selectedToken]);
+
+  const hlToken = hlData.find(t => t.name === selectedToken);
+  const whalesToken = whalesData.find(t => t.symbol === selectedToken);
+  const polyToken = data.find(t => t.id === selectedToken);
+  const topFDVs = polyToken ? [...(polyToken.fdvMarkets || [])].sort((a, b) => (b.yesPct || 0) - (a.yesPct || 0)).slice(0, 3) : [];
+  const supply = parseFloat(totalSupply) || 0;
+  const amount = parseFloat(tokenAmount) || 0;
+
+  let result: number | null = null;
+  let resultBreakdown = '';
+  let impliedPrice: number | null = null;
+
+  if (platform === 'hyperliquid' && hlToken && amount > 0) {
+    result = hlToken.markPrice * amount;
+    impliedPrice = hlToken.markPrice;
+    resultBreakdown = `${amount.toLocaleString()} ${hlToken.name} × $${hlToken.markPrice.toPrecision(4)}`;
+  } else if (platform === 'whales' && whalesToken && whalesToken.price > 0 && amount > 0) {
+    result = whalesToken.price * amount;
+    impliedPrice = whalesToken.price;
+    resultBreakdown = `${amount.toLocaleString()} ${whalesToken.symbol} × $${whalesToken.price.toPrecision(4)}`;
+  } else if (platform === 'polymarket' && selectedFDVQuestion && supply > 0 && amount > 0) {
+    const fdvUSD = parseFDV(selectedFDVQuestion) * 1_000_000;
+    impliedPrice = fdvUSD / supply;
+    result = impliedPrice * amount;
+    resultBreakdown = `FDV ${formatCurrency(fdvUSD)} ÷ ${supply >= 1e9 ? (supply / 1e9).toFixed(2) + 'B' : supply >= 1e6 ? (supply / 1e6).toFixed(2) + 'M' : supply.toLocaleString()} supply`;
+  }
+
+  const showAmountInput = !!(
+    platform && selectedToken &&
+    (platform === 'hyperliquid' ||
+      (platform === 'whales' && whalesToken && whalesToken.price > 0) ||
+      (platform === 'polymarket' && selectedFDVQuestion && supply > 0))
+  );
+
+  const accentColor = platform === 'hyperliquid' ? '#8b5cf6' : platform === 'whales' ? '#f59e0b' : '#00e5ff';
+
+  const selectClass = "w-full bg-[#0d0d0d] border border-white/[0.07] text-white text-sm rounded-2xl px-4 py-3.5 pr-10 focus:outline-none focus:border-white/20 transition-all appearance-none cursor-pointer hover:border-white/10";
+  const inputClass = "w-full bg-[#0d0d0d] border border-white/[0.07] text-white text-sm rounded-2xl px-4 py-3.5 focus:outline-none focus:border-white/20 transition-all placeholder-gray-600 hover:border-white/10";
+  const labelClass = "text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 block";
+
+  return (
+    <div className="max-w-lg mx-auto">
+      <div className="bg-[#050505] border border-white/[0.06] rounded-[2rem] p-6 md:p-8 relative overflow-hidden">
+        {/* ambient glow that shifts with platform */}
+        <div className="absolute -top-24 -right-24 w-56 h-56 rounded-full blur-[100px] pointer-events-none transition-colors duration-700" style={{ backgroundColor: `${accentColor}09` }} />
+        <div className="absolute -bottom-24 -left-24 w-56 h-56 rounded-full blur-[100px] pointer-events-none" style={{ backgroundColor: '#8b5cf608' }} />
+
+        <div className="relative z-10 flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center border border-white/[0.07]" style={{ backgroundColor: `${accentColor}15` }}>
+            <CalculatorIcon className="w-5 h-5" style={{ color: accentColor }} />
+          </div>
+          <div>
+            <h2 className="text-xl font-black text-white tracking-tight leading-none">Calculator</h2>
+            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mt-0.5">Estimate position value</p>
+          </div>
+        </div>
+
+        <div className="relative z-10 space-y-5">
+
+          {/* ── Platform ── */}
+          <div>
+            <label className={labelClass}>Platform</label>
+            <div className="relative">
+              <select value={platform} onChange={e => setPlatform(e.target.value as any)} className={selectClass}>
+                <option value="" disabled>Select platform…</option>
+                <option value="hyperliquid">Hyperliquid</option>
+                <option value="whales">Whales Market</option>
+                <option value="polymarket">Polymarket</option>
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* ── Token ── */}
+          <AnimatePresence>
+            {platform && (
+              <motion.div key="tok" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18, ease: 'easeOut' }}>
+                <label className={labelClass}>Token</label>
+                <div className="relative">
+                  <select value={selectedToken} onChange={e => setSelectedToken(e.target.value)} className={selectClass}>
+                    <option value="" disabled>Select token…</option>
+                    {platform === 'hyperliquid' && hlData.map(t => (
+                      <option key={t.name} value={t.name}>{t.name} — ${t.markPrice.toPrecision(4)}</option>
+                    ))}
+                    {platform === 'whales' && whalesData.map(t => (
+                      <option key={t.symbol} value={t.symbol}>{t.name} ({t.symbol}){t.price > 0 ? ` — $${t.price.toPrecision(4)}` : ' — No price'}</option>
+                    ))}
+                    {platform === 'polymarket' && data.map(t => (
+                      <option key={t.id} value={t.id}>{t.title}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Whales: no-price notice ── */}
+          <AnimatePresence>
+            {platform === 'whales' && whalesToken && whalesToken.price === 0 && (
+              <motion.div key="no-price" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2 text-xs text-gray-500 font-bold bg-white/[0.03] border border-white/[0.06] rounded-2xl px-4 py-3">
+                <Info className="w-3.5 h-3.5 flex-shrink-0" />
+                No OTC price available for this token yet.
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Polymarket: FDV selector ── */}
+          <AnimatePresence>
+            {platform === 'polymarket' && selectedToken && topFDVs.length > 0 && (
+              <motion.div key="fdv" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18, ease: 'easeOut' }}>
+                <label className={labelClass}>FDV Range <span className="normal-case tracking-normal font-bold text-gray-700">— select one</span></label>
+                <div className="flex flex-col gap-2">
+                  {topFDVs.map((m, i) => {
+                    const match = m.question?.match(/[\$>](\d+(?:\.\d+)?)(B|M|K)?/i);
+                    let label = m.question || '';
+                    if (match) { const n = match[1]; const unit = (match[2] || 'M').toUpperCase(); label = `$${n}${unit}`; }
+                    const isSelected = selectedFDVQuestion === m.question;
+                    return (
+                      <button key={i} onClick={() => setSelectedFDVQuestion(isSelected ? '' : m.question)}
+                        className={`flex items-center justify-between px-4 py-3 rounded-2xl border text-sm font-bold transition-all duration-200 ${isSelected ? 'border-[#00e5ff]/40 text-[#00e5ff]' : 'bg-[#0d0d0d] border-white/[0.07] text-gray-400 hover:border-white/10 hover:text-gray-200'}`}
+                        style={isSelected ? { backgroundColor: '#00e5ff12' } : {}}
+                      >
+                        <span className="font-black">{label}</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: isSelected ? '#00e5ff' : '#4b5563' }}>{Math.round(m.yesPct || 0)}% prob</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+            {platform === 'polymarket' && selectedToken && topFDVs.length === 0 && (
+              <motion.div key="no-fdv" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2 text-xs text-gray-500 font-bold bg-white/[0.03] border border-white/[0.06] rounded-2xl px-4 py-3">
+                <Info className="w-3.5 h-3.5 flex-shrink-0" />
+                No FDV market data available for this token.
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Polymarket: Total supply ── */}
+          <AnimatePresence>
+            {platform === 'polymarket' && selectedFDVQuestion && (
+              <motion.div key="supply" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18, ease: 'easeOut' }}>
+                <label className={labelClass}>Total Supply</label>
+                <input type="number" placeholder="e.g. 1000000000" value={totalSupply} onChange={e => setTotalSupply(e.target.value)} className={inputClass} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Token amount ── */}
+          <AnimatePresence>
+            {showAmountInput && (
+              <motion.div key="amt" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18, ease: 'easeOut' }}>
+                <label className={labelClass}>Token Amount</label>
+                <input type="number" placeholder="Enter amount…" value={tokenAmount} onChange={e => setTokenAmount(e.target.value)} className={inputClass} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Result ── */}
+          <AnimatePresence>
+            {result !== null && (
+              <motion.div key="result"
+                initial={{ opacity: 0, scale: 0.97, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.97, y: 12 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+                className="rounded-2xl border p-6 text-center"
+                style={{ borderColor: `${accentColor}30`, background: `radial-gradient(ellipse at top, ${accentColor}08 0%, transparent 70%), #080808` }}
+              >
+                <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-3">Estimated Value</div>
+                <div className="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight" style={{ textShadow: `0 0 40px ${accentColor}50` }}>
+                  {formatCurrency(result)}
+                </div>
+                {impliedPrice !== null && (
+                  <div className="text-xs font-bold mb-1" style={{ color: accentColor }}>
+                    Implied price per token: ${impliedPrice < 0.0001 ? impliedPrice.toExponential(3) : impliedPrice < 1 ? impliedPrice.toPrecision(4) : impliedPrice.toFixed(4)}
+                  </div>
+                )}
+                <div className="text-[10px] text-gray-600 font-bold mt-1 leading-relaxed">{resultBreakdown}</div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function InteractiveBackground() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -568,7 +769,7 @@ function InteractiveBackground() {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'polymarket' | 'hyperliquid' | 'whales'>('polymarket');
+  const [activeTab, setActiveTab] = useState<'polymarket' | 'hyperliquid' | 'whales' | 'calculator'>('polymarket');
   const [data, setData] = useState<TokenData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -651,6 +852,7 @@ export default function App() {
               <button onClick={() => setActiveTab('polymarket')} className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'polymarket' ? 'bg-[#00e5ff] text-black shadow-[0_0_20px_rgba(0,229,255,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Polymarket</button>
               <button onClick={() => setActiveTab('hyperliquid')} className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'hyperliquid' ? 'bg-[#8b5cf6] text-black shadow-[0_0_20px_rgba(139,92,246,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Hyperliquid</button>
               <button onClick={() => setActiveTab('whales')} className={`flex-shrink-0 px-5 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'whales' ? 'bg-[#f59e0b] text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Whales Market</button>
+              <button onClick={() => setActiveTab('calculator')} className={`flex-shrink-0 flex items-center gap-2 px-5 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'calculator' ? 'bg-[#10b981] text-black shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}><CalculatorIcon className="w-3.5 h-3.5" />Calc</button>
             </div>
           </div>
           <div className="relative w-full md:w-72">
@@ -728,6 +930,11 @@ export default function App() {
                 )}
               </div>
               {!whalesLoading && filteredWhalesData.length === 0 && !whalesError && (<div className="text-center py-32 bg-[#111]/30 border border-[#222] rounded-[3rem] border-dashed backdrop-blur-sm"><BarChart3 className="w-12 h-12 text-gray-700 mx-auto mb-4" /><h3 className="text-gray-300 text-lg font-black tracking-tight">No pre-market tokens found</h3><p className="text-gray-500 text-sm mt-2">Try adjusting your search or check back later.</p></div>)}
+            </motion.div>
+          )}
+          {activeTab === 'calculator' && (
+            <motion.div key="calculator" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18, ease: "easeOut" }} className="py-4">
+              <Calculator data={data} hlData={hlData} whalesData={whalesData} />
             </motion.div>
           )}
         </AnimatePresence>
