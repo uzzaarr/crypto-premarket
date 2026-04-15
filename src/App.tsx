@@ -151,12 +151,7 @@ function ProbabilityCurve({ pct, color }: { pct: number; color: string }) {
   return (
     <div className="relative h-16 w-full mt-2 overflow-hidden rounded-xl bg-black/20 border border-white/5">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full opacity-30">
-        <motion.polygon 
-          initial={{ points: "0,100 20,100 50,100 80,100 100,100" }}
-          animate={{ points }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
-          fill={color} 
-        />
+        <polygon points={points} fill={color} />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <span className="text-2xl font-black" style={{ color }}>{pct}%</span>
@@ -179,23 +174,10 @@ function PriceCurve({ prices, color }: { prices: number[]; color: string }) {
   return (
     <div className="relative h-16 w-full mt-2 overflow-hidden rounded-xl bg-black/20 border border-white/5">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full opacity-30">
-        <motion.polygon 
-          initial={{ points: "0,100 100,100" }}
-          animate={{ points }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
-          fill={color} 
-        />
+        <polygon points={points} fill={color} />
       </svg>
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full">
-        <motion.polyline 
-          initial={{ points: "0,100 100,100" }}
-          animate={{ points: pts.join(" ") }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
-          fill="none"
-          stroke={color}
-          strokeWidth="2"
-          vectorEffect="non-scaling-stroke"
-        />
+        <polyline points={pts.join(" ")} fill="none" stroke={color} strokeWidth="2" vectorEffect="non-scaling-stroke" />
       </svg>
     </div>
   );
@@ -225,16 +207,8 @@ function TGEChartModal({ token, onClose }: { token: TokenData; onClose: () => vo
   const tgeList = getTGEData(token.allMarkets).slice(0, 3);
   if (!tgeList.length) return null;
   return (
-    <motion.div 
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-md"
-      onClick={onClose}
-    >
-      <motion.div 
-        initial={{ scale: 0.95, opacity: 0, y: 16 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 16 }} transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-        className="bg-[#0f0f0f] border border-[#222] rounded-[2rem] p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
-        onClick={e => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-[#0f0f0f] border border-[#222] rounded-[2rem] p-8 max-w-md w-full shadow-2xl relative overflow-hidden" onClick={e => e.stopPropagation()}>
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#f59e0b]/10 blur-[50px] rounded-full" />
         <div className="flex justify-between items-start mb-2 relative z-10">
           <div>
@@ -254,14 +228,9 @@ function TGEChartModal({ token, onClose }: { token: TokenData; onClose: () => vo
               if (dateMatch) shortLabel = `${dateMatch[1].slice(0, 3)} '${dateMatch[2].slice(2)}`;
               else if (item.label.match(/202[5-9]/)) shortLabel = item.label.replace(/20(2[5-9])/, "'$1");
               return (
-                <div key={i} className="flex flex-col items-center flex-1 h-full justify-end group">
+                <div key={i} className="flex flex-col items-center flex-1 h-full justify-end">
                   <div className="w-full max-w-[60px] bg-[#1a1a1a] rounded-t-xl relative overflow-hidden flex items-end justify-center" style={{ height: '100%' }}>
-                    <motion.div 
-                      initial={{ height: 0 }}
-                      animate={{ height: `${heightPct}%` }}
-                      transition={{ duration: 0.45, delay: i * 0.08, ease: "easeOut" }}
-                      className="w-full bg-gradient-to-t from-[#f59e0b]/20 to-[#f59e0b] rounded-t-xl absolute bottom-0 border-t border-[#f59e0b]"
-                    />
+                    <div className="w-full bg-gradient-to-t from-[#f59e0b]/20 to-[#f59e0b] rounded-t-xl absolute bottom-0 border-t border-[#f59e0b]" style={{ height: `${heightPct}%` }} />
                     <span className="relative z-10 mb-2 text-xs font-black text-white drop-shadow-md">{item.confidence}%</span>
                   </div>
                   <div className="mt-3 text-[10px] text-gray-400 font-bold uppercase tracking-wider text-center h-8 flex items-start justify-center leading-tight">{shortLabel}</div>
@@ -271,8 +240,8 @@ function TGEChartModal({ token, onClose }: { token: TokenData; onClose: () => vo
           </div>
           <div className="mt-6 text-center text-[10px] text-gray-500 uppercase tracking-widest font-bold">Top {tgeList.length} Estimated Dates</div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 
@@ -299,16 +268,8 @@ function FDVChartModal({ token, onClose }: { token: TokenData; onClose: () => vo
   });
   const points = `0,100 ${pts.join(" ")} 100,100`;
   return (
-    <motion.div 
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-md"
-      onClick={onClose}
-    >
-      <motion.div 
-        initial={{ scale: 0.95, opacity: 0, y: 16 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 16 }} transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-        className="bg-[#0f0f0f] border border-[#222] rounded-[2rem] p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
-        onClick={e => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-[#0f0f0f] border border-[#222] rounded-[2rem] p-8 max-w-md w-full shadow-2xl relative overflow-hidden" onClick={e => e.stopPropagation()}>
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#00e5ff]/10 blur-[50px] rounded-full" />
         <div className="flex justify-between items-start mb-2 relative z-10">
           <div>
@@ -322,10 +283,10 @@ function FDVChartModal({ token, onClose }: { token: TokenData; onClose: () => vo
         <div className="relative z-10 mt-8">
           <div className="relative h-48 w-full overflow-visible">
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full opacity-20 overflow-visible">
-              <motion.polygon initial={{ points: "0,100 100,100" }} animate={{ points }} transition={{ duration: 0.5, ease: "easeOut" }} fill="#00e5ff" />
+              <polygon points={points} fill="#00e5ff" />
             </svg>
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full overflow-visible">
-              <motion.polyline initial={{ points: "0,100 100,100" }} animate={{ points: pts.join(" ") }} transition={{ duration: 0.5, ease: "easeOut" }} fill="none" stroke="#00e5ff" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+              <polyline points={pts.join(" ")} fill="none" stroke="#00e5ff" strokeWidth="3" vectorEffect="non-scaling-stroke" />
             </svg>
             {topFDVs.map((m, i) => {
               const x = topFDVs.length > 1 ? (i / (topFDVs.length - 1)) * 100 : 50;
@@ -334,18 +295,18 @@ function FDVChartModal({ token, onClose }: { token: TokenData; onClose: () => vo
               let label = m.question || "";
               if (match) { const n = match[1]; const unit = (match[2] || "M").toUpperCase(); label = `$${n}${unit}`; }
               return (
-                <motion.div key={i} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 + i * 0.1 }} className="absolute flex flex-col items-center justify-center" style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }}>
+                <div key={i} className="absolute flex flex-col items-center justify-center" style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }}>
                   <div className="w-3 h-3 bg-[#00e5ff] rounded-full border-2 border-[#0f0f0f] shadow-[0_0_10px_#00e5ff]" />
                   <div className="absolute bottom-full mb-2 text-white font-black text-sm drop-shadow-md">{Math.round(m.yesPct || 0)}%</div>
                   <div className="absolute top-full mt-4 text-gray-400 font-bold text-[10px] whitespace-nowrap">{label}</div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
           <div className="mt-12 text-center text-[10px] text-gray-500 uppercase tracking-widest font-bold">Top {topFDVs.length} FDV Targets</div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 
@@ -355,7 +316,7 @@ function TokenCard({ token, onShowTGE, onShowFDV }: { key?: any; token: TokenDat
   const highestFDV = token.fdvMarkets && token.fdvMarkets.length > 0 
     ? [...token.fdvMarkets].sort((a, b) => (b.yesPct || 0) - (a.yesPct || 0))[0] : null;
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-300 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-[transform,border-color,box-shadow] duration-200 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"><div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4px_4px]" /></div>
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#00e5ff]/5 blur-[80px] group-hover:bg-[#00e5ff]/15 transition-colors duration-500 z-0" />
       <div className="flex items-start gap-4 mb-6 relative z-10">
@@ -396,7 +357,7 @@ function HyperliquidCard({ token }: { token: HLTokenData }) {
   const isPositive = token.priceChangePct >= 0;
   const color = isPositive ? "#00e5ff" : "#f43f5e";
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-300 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-[transform,border-color,box-shadow] duration-200 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"><div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4px_4px]" /></div>
       <div className="absolute -top-24 -right-24 w-48 h-48 blur-[80px] transition-colors duration-500 z-0" style={{ backgroundColor: `${color}10` }} />
       <div className="flex items-start gap-4 mb-6 relative z-10">
@@ -431,7 +392,7 @@ function MexcCard({ token }: { token: MexcTokenData }) {
   const isPositive = token.priceChangePct >= 0;
   const color = isPositive ? "#10b981" : "#f43f5e";
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-300 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-[transform,border-color,box-shadow] duration-200 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"><div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4px_4px]" /></div>
       <div className="absolute -top-24 -right-24 w-48 h-48 blur-[80px] transition-colors duration-500 z-0" style={{ backgroundColor: `${color}10` }} />
       <div className="flex items-start gap-4 mb-6 relative z-10">
@@ -461,7 +422,7 @@ function MexcCard({ token }: { token: MexcTokenData }) {
 function WhalesCard({ token }: { token: WhalesTokenData }) {
   const isPositive = token.priceChange >= 0;
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-300 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-[transform,border-color,box-shadow] duration-200 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"><div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4px_4px]" /></div>
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#f59e0b]/5 blur-[80px] group-hover:bg-[#f59e0b]/10 transition-colors duration-500 z-0" />
 
@@ -878,7 +839,7 @@ export default function App() {
               <AnimatePresence>
                 {error && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3"><Info className="w-5 h-5 text-red-500" /><p className="text-red-500/90 text-xs font-bold uppercase tracking-wider">{error}</p></motion.div>}
               </AnimatePresence>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="card-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {loading && data.length === 0 ? [...Array(8)].map((_, i) => <div key={i} className="h-[380px] bg-[#111]/50 border border-[#222] rounded-[2rem] animate-pulse" />) : (
                   <AnimatePresence mode="popLayout">{filteredData.map((token) => <TokenCard key={token.id} token={token} onShowTGE={setSelectedTGE} onShowFDV={setSelectedFDV} />)}</AnimatePresence>
                 )}
@@ -902,7 +863,7 @@ export default function App() {
               <AnimatePresence>
                 {hlError && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3"><Info className="w-5 h-5 text-red-500" /><p className="text-red-500/90 text-xs font-bold uppercase tracking-wider">{hlError}</p></motion.div>}
               </AnimatePresence>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="card-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {hlLoading && hlData.length === 0 ? [...Array(8)].map((_, i) => <div key={i} className="h-[380px] bg-[#111]/50 border border-[#222] rounded-[2rem] animate-pulse" />) : (
                   <AnimatePresence mode="popLayout">{filteredHlData.map((token) => <HyperliquidCard key={token.name} token={token} />)}</AnimatePresence>
                 )}
@@ -924,7 +885,7 @@ export default function App() {
               <AnimatePresence>
                 {whalesError && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3"><Info className="w-5 h-5 text-red-500" /><p className="text-red-500/90 text-xs font-bold uppercase tracking-wider">{whalesError}</p></motion.div>}
               </AnimatePresence>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="card-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {whalesLoading && whalesData.length === 0 ? [...Array(8)].map((_, i) => <div key={i} className="h-[380px] bg-[#111]/50 border border-[#222] rounded-[2rem] animate-pulse" />) : (
                   <AnimatePresence mode="popLayout">{filteredWhalesData.map((token) => <WhalesCard key={token.id} token={token} />)}</AnimatePresence>
                 )}
