@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from "motion/react";
+import { motion, AnimatePresence, useMotionValue, useSpring } from "motion/react";
 import { HeroGeometric } from "./components/ui/shape-landing-hero";
 import { 
   RefreshCw, 
@@ -495,10 +495,6 @@ export default function App() {
   const [selectedTGE, setSelectedTGE] = useState<TokenData | null>(null);
   const [selectedFDV, setSelectedFDV] = useState<TokenData | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: containerRef, layoutEffect: false });
-  const headerY = useTransform(scrollYProgress, [0, 0.2], [0, -50]);
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   const fetchData = async () => {
     try {
@@ -541,11 +537,11 @@ export default function App() {
   const filteredMexcData = mexcData.filter(t => t.vn.toLowerCase().includes(searchQuery.toLowerCase()) || t.fn.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-transparent text-[#f0f0f0] font-sans selection:bg-[#00e5ff]/30 overflow-x-hidden relative">
+    <div className="min-h-screen bg-transparent text-[#f0f0f0] font-sans selection:bg-[#00e5ff]/30 overflow-x-hidden relative">
       <InteractiveBackground />
-      <motion.div style={{ y: headerY, opacity: headerOpacity }} className="relative z-10 w-full">
+      <div className="relative z-10 w-full">
         <HeroGeometric badge="Global Premarket Index" title1="PRE" title2="MARKET" />
-      </motion.div>
+      </div>
       <div className="relative z-10 max-w-7xl mx-auto px-6 pb-16 md:pb-24">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
           <div className="flex justify-center gap-4">

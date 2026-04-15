@@ -3,41 +3,32 @@
 import { motion } from "motion/react";
 import { Circle } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { useEffect, useState } from "react";
+
+const volumeBars = Array.from({ length: 30 }).map((_, i) => ({
+    height: 20 + ((i * 17) % 80),
+    isUp: i % 3 !== 0,
+}));
+
+const candlesticks = [
+    {x: 100, y: 320, up: true},
+    {x: 200, y: 340, up: false},
+    {x: 300, y: 280, up: true},
+    {x: 400, y: 290, up: false},
+    {x: 500, y: 200, up: true},
+    {x: 600, y: 220, up: false},
+    {x: 700, y: 150, up: true},
+    {x: 800, y: 180, up: false},
+    {x: 900, y: 80,  up: true},
+    {x: 1000, y: 100, up: false},
+    {x: 1100, y: 40,  up: true},
+];
 
 function CryptoChartBackground() {
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => setMounted(true), []);
-
-    if (!mounted) return null;
-
-    // Generate deterministic random values for volume bars
-    const volumeBars = Array.from({ length: 30 }).map((_, i) => {
-        const height = 20 + ((i * 17) % 80);
-        const isUp = i % 3 !== 0;
-        return { height, isUp };
-    });
-
-    const candlesticks = [
-        {x: 100, y: 320, up: true},
-        {x: 200, y: 340, up: false},
-        {x: 300, y: 280, up: true},
-        {x: 400, y: 290, up: false},
-        {x: 500, y: 200, up: true},
-        {x: 600, y: 220, up: false},
-        {x: 700, y: 150, up: true},
-        {x: 800, y: 180, up: false},
-        {x: 900, y: 80, up: true},
-        {x: 1000, y: 100, up: false},
-        {x: 1100, y: 40, up: true},
-    ];
-
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {/* Faint grid background */}
+            {/* Grid */}
             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_40%,transparent_100%)]" />
-            
-            {/* Animated Chart SVG */}
+
             <svg className="absolute w-full h-full opacity-60" viewBox="0 0 1200 400" preserveAspectRatio="none">
                 <defs>
                     <linearGradient id="line-grad" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
@@ -50,35 +41,46 @@ function CryptoChartBackground() {
                         <stop stopColor="#00e5ff" stopOpacity="0.15" />
                         <stop offset="1" stopColor="#00e5ff" stopOpacity="0" />
                     </linearGradient>
+
+                    {/* One CSS keyframe for the whole volume-bar group — zero JS overhead */}
+                    <style>{`
+                        @keyframes bars-in {
+                            from { opacity: 0; transform: scaleY(0); transform-origin: bottom; }
+                            to   { opacity: 1; transform: scaleY(1); transform-origin: bottom; }
+                        }
+                        .vol-bars { animation: bars-in 1.2s ease-out forwards; }
+                        @keyframes fade-in {
+                            from { opacity: 0; }
+                            to   { opacity: 1; }
+                        }
+                        .area-fill  { animation: fade-in 2s ease-out 0.5s both; }
+                        .candles-g  { animation: fade-in 0.8s ease-out 1s both; }
+                    `}</style>
                 </defs>
 
-                {/* Volume Bars */}
-                <g className="opacity-20">
+                {/* Volume bars — plain SVG, one CSS animation on the group */}
+                <g className="vol-bars opacity-20">
                     {volumeBars.map((bar, i) => (
-                        <motion.rect
-                            key={`vol-${i}`}
+                        <rect
+                            key={i}
                             x={i * 40 + 10}
                             y={400 - bar.height}
                             width="20"
                             height={bar.height}
                             fill={bar.isUp ? "#00e5ff" : "#f43f5e"}
-                            initial={{ scaleY: 0, transformOrigin: "bottom" }}
-                            animate={{ scaleY: 1 }}
-                            transition={{ duration: 1.5, delay: i * 0.03, ease: "easeOut" }}
                         />
                     ))}
                 </g>
 
-                {/* Area Fill */}
-                <motion.path
+                {/* Area fill */}
+                <path
+                    className="area-fill"
                     d="M0 350 L 100 320 L 200 340 L 300 280 L 400 290 L 500 200 L 600 220 L 700 150 L 800 180 L 900 80 L 1000 100 L 1100 40 L 1200 20 L 1200 400 L 0 400 Z"
                     fill="url(#area-grad)"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 2, delay: 0.5 }}
+                    style={{ opacity: 0 }}
                 />
 
-                {/* Main Line */}
+                {/* Main line — keep pathLength animation (runs once, GPU-composited) */}
                 <motion.path
                     d="M0 350 L 100 320 L 200 340 L 300 280 L 400 290 L 500 200 L 600 220 L 700 150 L 800 180 L 900 80 L 1000 100 L 1100 40 L 1200 20"
                     stroke="url(#line-grad)"
@@ -89,48 +91,19 @@ function CryptoChartBackground() {
                     transition={{ duration: 2.5, ease: "easeInOut" }}
                 />
 
-                {/* Candlesticks along the line */}
-                <g>
+                {/* Candlesticks — single fade-in on the group, no per-element motion */}
+                <g className="candles-g" style={{ opacity: 0 }}>
                     {candlesticks.map((pt, i) => (
-                        <motion.g 
-                            key={`candle-${i}`}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 1 + i * 0.1 }}
-                        >
-                            {/* Wick */}
-                            <line x1={pt.x} y1={pt.y - 15} x2={pt.x} y2={pt.y + 15} stroke={pt.up ? "#00e5ff" : "#f43f5e"} strokeWidth="2" opacity="0.6" />
-                            {/* Body */}
-                            <rect x={pt.x - 4} y={pt.up ? pt.y - 8 : pt.y - 2} width="8" height="10" fill={pt.up ? "#00e5ff" : "#f43f5e"} opacity="0.8" />
-                        </motion.g>
+                        <g key={i}>
+                            <line x1={pt.x} y1={pt.y - 15} x2={pt.x} y2={pt.y + 15}
+                                stroke={pt.up ? "#00e5ff" : "#f43f5e"} strokeWidth="2" opacity="0.6" />
+                            <rect x={pt.x - 4} y={pt.up ? pt.y - 8 : pt.y - 2}
+                                width="8" height="10"
+                                fill={pt.up ? "#00e5ff" : "#f43f5e"} opacity="0.8" />
+                        </g>
                     ))}
                 </g>
             </svg>
-
-            {/* Floating particles (very lightweight) */}
-            <div className="absolute inset-0">
-                {Array.from({ length: 15 }).map((_, i) => (
-                    <motion.div
-                        key={`particle-${i}`}
-                        className="absolute w-1 h-1 rounded-full bg-[#00e5ff]"
-                        style={{
-                            left: `${10 + (i * 7) % 80}%`,
-                            top: `${20 + (i * 13) % 60}%`,
-                            opacity: 0.2
-                        }}
-                        animate={{
-                            y: [0, -15, 0],
-                            opacity: [0.1, 0.5, 0.1]
-                        }}
-                        transition={{
-                            duration: 3 + (i % 4),
-                            repeat: Number.POSITIVE_INFINITY,
-                            ease: "easeInOut",
-                            delay: i * 0.2
-                        }}
-                    />
-                ))}
-            </div>
         </div>
     );
 }
@@ -159,7 +132,6 @@ function HeroGeometric({
 
     return (
         <div className="relative w-full flex items-center justify-center overflow-hidden pt-24 pb-12">
-            {/* Removed heavy blur-3xl gradient for performance */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/[0.02] via-transparent to-[#00e5ff]/[0.02]" />
 
             <CryptoChartBackground />
@@ -190,11 +162,7 @@ function HeroGeometric({
                                 {title1}
                             </span>
                             <br />
-                            <span
-                                className={cn(
-                                    "bg-clip-text text-transparent bg-gradient-to-r from-[#00e5ff] via-white/90 to-[#8b5cf6] "
-                                )}
-                            >
+                            <span className={cn("bg-clip-text text-transparent bg-gradient-to-r from-[#00e5ff] via-white/90 to-[#8b5cf6]")}>
                                 {title2}
                             </span>
                         </h1>
