@@ -57,6 +57,22 @@ interface MexcTokenData {
   priceChangePct: number;
 }
 
+interface WhalesTokenData {
+  id: string;
+  symbol: string;
+  name: string;
+  icon: string;
+  price: number;
+  priceChange: number;
+  volume24h: number;
+  waitingCount: number;
+  network: string;
+  networkIcon: string;
+  narratives: string;
+  totalFundRaise: number;
+  moniScore: number;
+}
+
 const MEXC_KNOWN_DATA: Record<string, { fn: string; idu: string }> = {
   "GENIUS": { fn: "Genius", idu: "Genius Terminal is the first private and final onchain terminal." },
   "ST": { fn: "Sentio", idu: "Sentio is a unified Web3 observability and data platform." },
@@ -441,6 +457,83 @@ function MexcCard({ token }: { token: MexcTokenData }) {
   );
 }
 
+function WhalesCard({ token }: { token: WhalesTokenData }) {
+  const isPositive = token.priceChange >= 0;
+  return (
+    <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} whileHover={{ y: -4 }} transition={{ duration: 0.3 }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-500 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] group relative overflow-hidden flex flex-col will-change-transform">
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"><div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4px_4px]" /></div>
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#f59e0b]/5 blur-[80px] group-hover:bg-[#f59e0b]/10 transition-colors duration-500 z-0" />
+
+      {/* Header */}
+      <div className="flex items-start gap-4 mb-6 relative z-10">
+        <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-lg font-black text-gray-500 overflow-hidden flex-shrink-0 shadow-inner group-hover:border-white/10 transition-all duration-500">
+          {token.icon ? <img src={token.icon} alt={token.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" /> : token.symbol.slice(0, 2).toUpperCase()}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-bold text-gray-100 truncate mb-1 tracking-tight group-hover:text-white transition-colors">{token.name}</h3>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{token.symbol}</span>
+            {token.network && (
+              <div className="flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded-md">
+                {token.networkIcon && <img src={token.networkIcon} alt={token.network} className="w-3 h-3 rounded-full" referrerPolicy="no-referrer" onError={e => (e.currentTarget.style.display = 'none')} />}
+                <span className="text-[9px] text-gray-400 font-bold">{token.network}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="flex-1 flex flex-col gap-4 relative z-10">
+        <div className="bg-white/5 rounded-2xl p-4 border border-white/5 group-hover:bg-white/[0.07] transition-colors duration-500">
+          <div className="grid grid-cols-2 gap-4 mb-3">
+            <div>
+              <div className="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-1">Demand</div>
+              <div className="text-xl font-black text-[#f59e0b]">{token.waitingCount.toLocaleString()}</div>
+              <div className="text-[9px] text-gray-600 mt-0.5">waiting</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-1">Raised</div>
+              <div className="text-xl font-black text-gray-100">{token.totalFundRaise > 0 ? formatCurrency(token.totalFundRaise) : '—'}</div>
+            </div>
+          </div>
+          {token.price > 0 && (
+            <div className="flex justify-between items-center pt-3 border-t border-white/5">
+              <div>
+                <div className="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-1">OTC Price</div>
+                <div className="text-sm font-black text-gray-100">${token.price.toPrecision(4)}</div>
+              </div>
+              {token.priceChange !== 0 && (
+                <div className={`text-sm font-black ${isPositive ? 'text-[#00e5ff]' : 'text-[#f43f5e]'}`}>
+                  {isPositive ? '+' : ''}{token.priceChange.toFixed(2)}%
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {token.narratives && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[9px] text-[#f59e0b] font-black uppercase tracking-widest bg-[#f59e0b]/10 border border-[#f59e0b]/20 px-2.5 py-1 rounded-full">
+              {token.narratives}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-6 pt-4 border-t border-white/5 flex justify-between items-center relative z-10">
+        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+          Moni <span className="text-gray-300 ml-1">{token.moniScore.toLocaleString()}</span>
+        </div>
+        <a href={`https://whales.market/pre-market/${token.symbol.toLowerCase()}`} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 text-gray-400">
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+      </div>
+    </motion.div>
+  );
+}
+
 function InteractiveBackground() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -481,7 +574,7 @@ function InteractiveBackground() {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'polymarket' | 'hyperliquid' | 'mexc'>('polymarket');
+  const [activeTab, setActiveTab] = useState<'polymarket' | 'hyperliquid' | 'whales'>('polymarket');
   const [data, setData] = useState<TokenData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -491,6 +584,9 @@ export default function App() {
   const [mexcData, setMexcData] = useState<MexcTokenData[]>([]);
   const [mexcLoading, setMexcLoading] = useState(true);
   const [mexcError, setMexcError] = useState<string | null>(null);
+  const [whalesData, setWhalesData] = useState<WhalesTokenData[]>([]);
+  const [whalesLoading, setWhalesLoading] = useState(true);
+  const [whalesError, setWhalesError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [selectedTGE, setSelectedTGE] = useState<TokenData | null>(null);
   const [selectedFDV, setSelectedFDV] = useState<TokenData | null>(null);
@@ -526,15 +622,26 @@ export default function App() {
     finally { setMexcLoading(false); }
   };
 
+  const fetchWhalesData = async () => {
+    try {
+      setWhalesLoading(true); setWhalesError(null);
+      const res = await axios.get("/api/whales");
+      if (res.data.success) { setWhalesData(res.data.data); setLastUpdated(new Date()); }
+      else throw new Error(res.data.error || "Failed to fetch Whales Market data");
+    } catch (e: any) { setWhalesError(e.message || "Failed to fetch Whales Market data."); }
+    finally { setWhalesLoading(false); }
+  };
+
   useEffect(() => {
-    fetchData(); fetchHlData(); fetchMexcData();
-    const interval = setInterval(() => { fetchData(); fetchHlData(); fetchMexcData(); }, 3600000);
+    fetchData(); fetchHlData(); fetchMexcData(); fetchWhalesData();
+    const interval = setInterval(() => { fetchData(); fetchHlData(); fetchMexcData(); fetchWhalesData(); }, 3600000);
     return () => clearInterval(interval);
   }, []);
 
   const filteredData = data.filter(t => t.title.toLowerCase().includes(searchQuery.toLowerCase()) || t.slug.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredHlData = hlData.filter(t => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredMexcData = mexcData.filter(t => t.vn.toLowerCase().includes(searchQuery.toLowerCase()) || t.fn.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredWhalesData = whalesData.filter(t => t.name.toLowerCase().includes(searchQuery.toLowerCase()) || t.symbol.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div className="min-h-screen bg-transparent text-[#f0f0f0] font-sans selection:bg-[#00e5ff]/30 overflow-x-hidden relative">
@@ -547,6 +654,7 @@ export default function App() {
           <div className="flex justify-center gap-4">
             <button onClick={() => setActiveTab('polymarket')} className={`px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'polymarket' ? 'bg-[#00e5ff] text-black shadow-[0_0_20px_rgba(0,229,255,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Polymarket</button>
             <button onClick={() => setActiveTab('hyperliquid')} className={`px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'hyperliquid' ? 'bg-[#8b5cf6] text-black shadow-[0_0_20px_rgba(139,92,246,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Hyperliquid</button>
+            <button onClick={() => setActiveTab('whales')} className={`px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all ${activeTab === 'whales' ? 'bg-[#f59e0b] text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]' : 'bg-[#111] text-gray-500 hover:text-white border border-[#222]'}`}>Whales Market</button>
           </div>
           <div className="relative w-full md:w-72">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><Search className="h-4 w-4 text-gray-500" /></div>
@@ -596,11 +704,25 @@ export default function App() {
           </div>
         )}
 
+        {activeTab === 'whales' && (
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 pb-8 border-b border-[#111]">
+            <div className="flex flex-wrap justify-center md:justify-start items-center gap-8">
+              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#f59e0b] transition-colors">Tracked Tokens</div><div className="text-2xl font-black text-white">{filteredWhalesData.length}</div></div>
+              <div className="hidden md:block w-px h-8 bg-[#222]" />
+              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#f59e0b] transition-colors">Total Waiting</div><div className="text-2xl font-black text-white">{filteredWhalesData.reduce((a, t) => a + t.waitingCount, 0).toLocaleString()}</div></div>
+            </div>
+            <div className="flex items-center gap-6">
+              {lastUpdated && <div className="text-[10px] text-gray-600 font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] animate-pulse" />SYNCED {lastUpdated.toLocaleTimeString()}</div>}
+              <button onClick={fetchWhalesData} disabled={whalesLoading} className="group relative bg-white text-black px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.2)]"><span className="relative z-10 flex items-center gap-2">{whalesLoading ? "Syncing..." : "Refresh"}<RefreshCw className={`w-3 h-3 ${whalesLoading ? 'animate-spin' : ''}`} /></span></button>
+            </div>
+          </div>
+        )}
+
         <AnimatePresence>
-          {(error || hlError || mexcError) && (
+          {(error || hlError || whalesError) && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3">
               <Info className="w-5 h-5 text-red-500" />
-              <p className="text-red-500/90 text-xs font-bold uppercase tracking-wider">{activeTab === 'polymarket' ? error : activeTab === 'hyperliquid' ? hlError : mexcError}</p>
+              <p className="text-red-500/90 text-xs font-bold uppercase tracking-wider">{activeTab === 'polymarket' ? error : activeTab === 'hyperliquid' ? hlError : whalesError}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -621,17 +743,17 @@ export default function App() {
           </div>
         )}
 
-        {activeTab === 'mexc' && (
+        {activeTab === 'whales' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {mexcLoading && mexcData.length === 0 ? [...Array(8)].map((_, i) => <div key={i} className="h-[380px] bg-[#111]/50 border border-[#222] rounded-[2rem] animate-pulse" />) : (
-              <AnimatePresence mode="popLayout">{filteredMexcData.map((token) => <MexcCard key={token.id} token={token} />)}</AnimatePresence>
+            {whalesLoading && whalesData.length === 0 ? [...Array(8)].map((_, i) => <div key={i} className="h-[380px] bg-[#111]/50 border border-[#222] rounded-[2rem] animate-pulse" />) : (
+              <AnimatePresence mode="popLayout">{filteredWhalesData.map((token) => <WhalesCard key={token.id} token={token} />)}</AnimatePresence>
             )}
           </div>
         )}
 
         {activeTab === 'polymarket' && !loading && filteredData.length === 0 && !error && (<div className="text-center py-32 bg-[#111]/30 border border-[#222] rounded-[3rem] border-dashed backdrop-blur-sm"><BarChart3 className="w-12 h-12 text-gray-700 mx-auto mb-4" /><h3 className="text-gray-300 text-lg font-black tracking-tight">No active markets detected</h3><p className="text-gray-500 text-sm mt-2">Try adjusting your search or check back later.</p></div>)}
         {activeTab === 'hyperliquid' && !hlLoading && filteredHlData.length === 0 && !hlError && (<div className="text-center py-32 bg-[#111]/30 border border-[#222] rounded-[3rem] border-dashed backdrop-blur-sm"><BarChart3 className="w-12 h-12 text-gray-700 mx-auto mb-4" /><h3 className="text-gray-300 text-lg font-black tracking-tight">No active pre-launch perps detected</h3><p className="text-gray-500 text-sm mt-2">Try adjusting your search or check back later.</p></div>)}
-        {activeTab === 'mexc' && !mexcLoading && filteredMexcData.length === 0 && !mexcError && (<div className="text-center py-32 bg-[#111]/30 border border-[#222] rounded-[3rem] border-dashed backdrop-blur-sm"><BarChart3 className="w-12 h-12 text-gray-700 mx-auto mb-4" /><h3 className="text-gray-300 text-lg font-black tracking-tight">No active MEXC premarket coins detected</h3><p className="text-gray-500 text-sm mt-2">Try adjusting your search or check back later.</p></div>)}
+        {activeTab === 'whales' && !whalesLoading && filteredWhalesData.length === 0 && !whalesError && (<div className="text-center py-32 bg-[#111]/30 border border-[#222] rounded-[3rem] border-dashed backdrop-blur-sm"><BarChart3 className="w-12 h-12 text-gray-700 mx-auto mb-4" /><h3 className="text-gray-300 text-lg font-black tracking-tight">No pre-market tokens found</h3><p className="text-gray-500 text-sm mt-2">Try adjusting your search or check back later.</p></div>)}
 
         <AnimatePresence>
           {selectedTGE && <TGEChartModal token={selectedTGE} onClose={() => setSelectedTGE(null)} />}
