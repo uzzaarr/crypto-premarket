@@ -152,7 +152,7 @@ function ProbabilityCurve({ pct, color }: { pct: number; color: string }) {
         <motion.polygon 
           initial={{ points: "0,100 20,100 50,100 80,100 100,100" }}
           animate={{ points }}
-          transition={{ duration: 1.5, type: "spring", bounce: 0.4 }}
+          transition={{ duration: 0.55, ease: "easeOut" }}
           fill={color} 
         />
       </svg>
@@ -180,7 +180,7 @@ function PriceCurve({ prices, color }: { prices: number[]; color: string }) {
         <motion.polygon 
           initial={{ points: "0,100 100,100" }}
           animate={{ points }}
-          transition={{ duration: 1.5, type: "spring", bounce: 0.4 }}
+          transition={{ duration: 0.55, ease: "easeOut" }}
           fill={color} 
         />
       </svg>
@@ -188,7 +188,7 @@ function PriceCurve({ prices, color }: { prices: number[]; color: string }) {
         <motion.polyline 
           initial={{ points: "0,100 100,100" }}
           animate={{ points: pts.join(" ") }}
-          transition={{ duration: 1.5, type: "spring", bounce: 0.4 }}
+          transition={{ duration: 0.55, ease: "easeOut" }}
           fill="none"
           stroke={color}
           strokeWidth="2"
@@ -229,7 +229,7 @@ function TGEChartModal({ token, onClose }: { token: TokenData; onClose: () => vo
       onClick={onClose}
     >
       <motion.div 
-        initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+        initial={{ scale: 0.95, opacity: 0, y: 16 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 16 }} transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
         className="bg-[#0f0f0f] border border-[#222] rounded-[2rem] p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
@@ -257,7 +257,7 @@ function TGEChartModal({ token, onClose }: { token: TokenData; onClose: () => vo
                     <motion.div 
                       initial={{ height: 0 }}
                       animate={{ height: `${heightPct}%` }}
-                      transition={{ duration: 0.8, delay: i * 0.1, type: "spring" }}
+                      transition={{ duration: 0.45, delay: i * 0.08, ease: "easeOut" }}
                       className="w-full bg-gradient-to-t from-[#f59e0b]/20 to-[#f59e0b] rounded-t-xl absolute bottom-0 border-t border-[#f59e0b]"
                     />
                     <span className="relative z-10 mb-2 text-xs font-black text-white drop-shadow-md">{item.confidence}%</span>
@@ -303,7 +303,7 @@ function FDVChartModal({ token, onClose }: { token: TokenData; onClose: () => vo
       onClick={onClose}
     >
       <motion.div 
-        initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+        initial={{ scale: 0.95, opacity: 0, y: 16 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 16 }} transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
         className="bg-[#0f0f0f] border border-[#222] rounded-[2rem] p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
@@ -320,10 +320,10 @@ function FDVChartModal({ token, onClose }: { token: TokenData; onClose: () => vo
         <div className="relative z-10 mt-8">
           <div className="relative h-48 w-full overflow-visible">
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full opacity-20 overflow-visible">
-              <motion.polygon initial={{ points: "0,100 100,100" }} animate={{ points }} transition={{ duration: 1, type: "spring", bounce: 0.3 }} fill="#00e5ff" />
+              <motion.polygon initial={{ points: "0,100 100,100" }} animate={{ points }} transition={{ duration: 0.5, ease: "easeOut" }} fill="#00e5ff" />
             </svg>
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full overflow-visible">
-              <motion.polyline initial={{ points: "0,100 100,100" }} animate={{ points: pts.join(" ") }} transition={{ duration: 1, type: "spring", bounce: 0.3 }} fill="none" stroke="#00e5ff" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+              <motion.polyline initial={{ points: "0,100 100,100" }} animate={{ points: pts.join(" ") }} transition={{ duration: 0.5, ease: "easeOut" }} fill="none" stroke="#00e5ff" strokeWidth="3" vectorEffect="non-scaling-stroke" />
             </svg>
             {topFDVs.map((m, i) => {
               const x = topFDVs.length > 1 ? (i / (topFDVs.length - 1)) * 100 : 50;
@@ -353,7 +353,7 @@ function TokenCard({ token, onShowTGE, onShowFDV }: { key?: any; token: TokenDat
   const highestFDV = token.fdvMarkets && token.fdvMarkets.length > 0 
     ? [...token.fdvMarkets].sort((a, b) => (b.yesPct || 0) - (a.yesPct || 0))[0] : null;
   return (
-    <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} whileHover={{ y: -4 }} transition={{ duration: 0.3 }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-500 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] group relative overflow-hidden flex flex-col will-change-transform">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-300 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"><div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4px_4px]" /></div>
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#00e5ff]/5 blur-[80px] group-hover:bg-[#00e5ff]/15 transition-colors duration-500 z-0" />
       <div className="flex items-start gap-4 mb-6 relative z-10">
@@ -394,7 +394,7 @@ function HyperliquidCard({ token }: { token: HLTokenData }) {
   const isPositive = token.priceChangePct >= 0;
   const color = isPositive ? "#00e5ff" : "#f43f5e";
   return (
-    <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} whileHover={{ y: -4 }} transition={{ duration: 0.3 }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-500 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] group relative overflow-hidden flex flex-col will-change-transform">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-300 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"><div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4px_4px]" /></div>
       <div className="absolute -top-24 -right-24 w-48 h-48 blur-[80px] transition-colors duration-500 z-0" style={{ backgroundColor: `${color}10` }} />
       <div className="flex items-start gap-4 mb-6 relative z-10">
@@ -429,7 +429,7 @@ function MexcCard({ token }: { token: MexcTokenData }) {
   const isPositive = token.priceChangePct >= 0;
   const color = isPositive ? "#10b981" : "#f43f5e";
   return (
-    <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} whileHover={{ y: -4 }} transition={{ duration: 0.3 }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-500 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] group relative overflow-hidden flex flex-col will-change-transform">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-300 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"><div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4px_4px]" /></div>
       <div className="absolute -top-24 -right-24 w-48 h-48 blur-[80px] transition-colors duration-500 z-0" style={{ backgroundColor: `${color}10` }} />
       <div className="flex items-start gap-4 mb-6 relative z-10">
@@ -459,7 +459,7 @@ function MexcCard({ token }: { token: MexcTokenData }) {
 function WhalesCard({ token }: { token: WhalesTokenData }) {
   const isPositive = token.priceChange >= 0;
   return (
-    <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} whileHover={{ y: -4 }} transition={{ duration: 0.3 }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-500 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] group relative overflow-hidden flex flex-col will-change-transform">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: "easeOut" }} className="bg-[#050505] border border-white/5 rounded-[2rem] p-6 transition-all duration-300 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(255,255,255,0.04)] hover:-translate-y-1 group relative overflow-hidden flex flex-col will-change-transform">
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"><div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4px_4px]" /></div>
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#f59e0b]/5 blur-[80px] group-hover:bg-[#f59e0b]/10 transition-colors duration-500 z-0" />
 
@@ -656,96 +656,78 @@ export default function App() {
           </div>
         </div>
 
-        {activeTab === 'polymarket' && (
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 pb-8 border-b border-[#111]">
-            <div className="flex flex-wrap justify-center md:justify-start items-center gap-8">
-              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#00e5ff] transition-colors">Tracked Assets</div><div className="text-2xl font-black text-white">{filteredData.length}</div></div>
-              <div className="hidden md:block w-px h-8 bg-[#222]" />
-              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#8b5cf6] transition-colors">Total Volume</div><div className="text-2xl font-black text-white">{formatCurrency(filteredData.reduce((acc, curr) => acc + curr.volume, 0))}</div></div>
-            </div>
-            <div className="flex items-center gap-6">
-              {lastUpdated && <div className="text-[10px] text-gray-600 font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-pulse" />SYNCED {lastUpdated.toLocaleTimeString()}</div>}
-              <button onClick={fetchData} disabled={loading} className="group relative bg-white text-black px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.2)]"><span className="relative z-10 flex items-center gap-2">{loading ? "Syncing..." : "Refresh"}<RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} /></span></button>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'hyperliquid' && (
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 pb-8 border-b border-[#111]">
-            <div className="flex flex-wrap justify-center md:justify-start items-center gap-8">
-              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#8b5cf6] transition-colors">Tracked Perps</div><div className="text-2xl font-black text-white">{hlData.length}</div></div>
-              <div className="hidden md:block w-px h-8 bg-[#222]" />
-              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#8b5cf6] transition-colors">24H Volume</div><div className="text-2xl font-black text-white">{formatCurrency(hlData.reduce((acc, curr) => acc + curr.volume24h, 0))}</div></div>
-            </div>
-            <div className="flex items-center gap-6">
-              {lastUpdated && <div className="text-[10px] text-gray-600 font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#8b5cf6] animate-pulse" />SYNCED {lastUpdated.toLocaleTimeString()}</div>}
-              <button onClick={fetchHlData} disabled={hlLoading} className="group relative bg-white text-black px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.2)]"><span className="relative z-10 flex items-center gap-2">{hlLoading ? "Syncing..." : "Refresh"}<RefreshCw className={`w-3 h-3 ${hlLoading ? 'animate-spin' : ''}`} /></span></button>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'mexc' && (
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 pb-8 border-b border-[#111]">
-            <div className="flex flex-wrap justify-center md:justify-start items-center gap-8">
-              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#10b981] transition-colors">Tracked Coins</div><div className="text-2xl font-black text-white">{mexcData.length}</div></div>
-              <div className="hidden md:block w-px h-8 bg-[#222]" />
-              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#10b981] transition-colors">Total Volume</div><div className="text-2xl font-black text-white">{formatCurrency(mexcData.reduce((acc, curr) => acc + curr.volume, 0))}</div></div>
-            </div>
-            <div className="flex items-center gap-6">
-              {lastUpdated && <div className="text-[10px] text-gray-600 font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />SYNCED {lastUpdated.toLocaleTimeString()}</div>}
-              <button onClick={fetchMexcData} disabled={mexcLoading} className="group relative bg-white text-black px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.2)]"><span className="relative z-10 flex items-center gap-2">{mexcLoading ? "Syncing..." : "Refresh"}<RefreshCw className={`w-3 h-3 ${mexcLoading ? 'animate-spin' : ''}`} /></span></button>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'whales' && (
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 pb-8 border-b border-[#111]">
-            <div className="flex flex-wrap justify-center md:justify-start items-center gap-8">
-              <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#f59e0b] transition-colors">Tracked Tokens</div><div className="text-2xl font-black text-white">{filteredWhalesData.length}</div></div>
-            </div>
-            <div className="flex items-center gap-6">
-              {lastUpdated && <div className="text-[10px] text-gray-600 font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] animate-pulse" />SYNCED {lastUpdated.toLocaleTimeString()}</div>}
-              <button onClick={fetchWhalesData} disabled={whalesLoading} className="group relative bg-white text-black px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.2)]"><span className="relative z-10 flex items-center gap-2">{whalesLoading ? "Syncing..." : "Refresh"}<RefreshCw className={`w-3 h-3 ${whalesLoading ? 'animate-spin' : ''}`} /></span></button>
-            </div>
-          </div>
-        )}
-
-        <AnimatePresence>
-          {(error || hlError || whalesError) && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3">
-              <Info className="w-5 h-5 text-red-500" />
-              <p className="text-red-500/90 text-xs font-bold uppercase tracking-wider">{activeTab === 'polymarket' ? error : activeTab === 'hyperliquid' ? hlError : whalesError}</p>
+        <AnimatePresence mode="wait">
+          {activeTab === 'polymarket' && (
+            <motion.div key="polymarket" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18, ease: "easeOut" }}>
+              <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 pb-8 border-b border-[#111]">
+                <div className="flex flex-wrap justify-center md:justify-start items-center gap-8">
+                  <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#00e5ff] transition-colors">Tracked Assets</div><div className="text-2xl font-black text-white">{filteredData.length}</div></div>
+                  <div className="hidden md:block w-px h-8 bg-[#222]" />
+                  <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#8b5cf6] transition-colors">Total Volume</div><div className="text-2xl font-black text-white">{formatCurrency(filteredData.reduce((acc, curr) => acc + curr.volume, 0))}</div></div>
+                </div>
+                <div className="flex items-center gap-6">
+                  {lastUpdated && <div className="text-[10px] text-gray-600 font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-pulse" />SYNCED {lastUpdated.toLocaleTimeString()}</div>}
+                  <button onClick={fetchData} disabled={loading} className="group relative bg-white text-black px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.2)]"><span className="relative z-10 flex items-center gap-2">{loading ? "Syncing..." : "Refresh"}<RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} /></span></button>
+                </div>
+              </div>
+              <AnimatePresence>
+                {error && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3"><Info className="w-5 h-5 text-red-500" /><p className="text-red-500/90 text-xs font-bold uppercase tracking-wider">{error}</p></motion.div>}
+              </AnimatePresence>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {loading && data.length === 0 ? [...Array(8)].map((_, i) => <div key={i} className="h-[380px] bg-[#111]/50 border border-[#222] rounded-[2rem] animate-pulse" />) : (
+                  <AnimatePresence mode="popLayout">{filteredData.map((token) => <TokenCard key={token.id} token={token} onShowTGE={setSelectedTGE} onShowFDV={setSelectedFDV} />)}</AnimatePresence>
+                )}
+              </div>
+              {!loading && filteredData.length === 0 && !error && (<div className="text-center py-32 bg-[#111]/30 border border-[#222] rounded-[3rem] border-dashed backdrop-blur-sm"><BarChart3 className="w-12 h-12 text-gray-700 mx-auto mb-4" /><h3 className="text-gray-300 text-lg font-black tracking-tight">No active markets detected</h3><p className="text-gray-500 text-sm mt-2">Try adjusting your search or check back later.</p></div>)}
+            </motion.div>
+          )}
+          {activeTab === 'hyperliquid' && (
+            <motion.div key="hyperliquid" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18, ease: "easeOut" }}>
+              <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 pb-8 border-b border-[#111]">
+                <div className="flex flex-wrap justify-center md:justify-start items-center gap-8">
+                  <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#8b5cf6] transition-colors">Tracked Perps</div><div className="text-2xl font-black text-white">{hlData.length}</div></div>
+                  <div className="hidden md:block w-px h-8 bg-[#222]" />
+                  <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#8b5cf6] transition-colors">24H Volume</div><div className="text-2xl font-black text-white">{formatCurrency(hlData.reduce((acc, curr) => acc + curr.volume24h, 0))}</div></div>
+                </div>
+                <div className="flex items-center gap-6">
+                  {lastUpdated && <div className="text-[10px] text-gray-600 font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#8b5cf6] animate-pulse" />SYNCED {lastUpdated.toLocaleTimeString()}</div>}
+                  <button onClick={fetchHlData} disabled={hlLoading} className="group relative bg-white text-black px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.2)]"><span className="relative z-10 flex items-center gap-2">{hlLoading ? "Syncing..." : "Refresh"}<RefreshCw className={`w-3 h-3 ${hlLoading ? 'animate-spin' : ''}`} /></span></button>
+                </div>
+              </div>
+              <AnimatePresence>
+                {hlError && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3"><Info className="w-5 h-5 text-red-500" /><p className="text-red-500/90 text-xs font-bold uppercase tracking-wider">{hlError}</p></motion.div>}
+              </AnimatePresence>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {hlLoading && hlData.length === 0 ? [...Array(8)].map((_, i) => <div key={i} className="h-[380px] bg-[#111]/50 border border-[#222] rounded-[2rem] animate-pulse" />) : (
+                  <AnimatePresence mode="popLayout">{filteredHlData.map((token) => <HyperliquidCard key={token.name} token={token} />)}</AnimatePresence>
+                )}
+              </div>
+              {!hlLoading && filteredHlData.length === 0 && !hlError && (<div className="text-center py-32 bg-[#111]/30 border border-[#222] rounded-[3rem] border-dashed backdrop-blur-sm"><BarChart3 className="w-12 h-12 text-gray-700 mx-auto mb-4" /><h3 className="text-gray-300 text-lg font-black tracking-tight">No active pre-launch perps detected</h3><p className="text-gray-500 text-sm mt-2">Try adjusting your search or check back later.</p></div>)}
+            </motion.div>
+          )}
+          {activeTab === 'whales' && (
+            <motion.div key="whales" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18, ease: "easeOut" }}>
+              <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 pb-8 border-b border-[#111]">
+                <div className="flex flex-wrap justify-center md:justify-start items-center gap-8">
+                  <div className="group"><div className="text-[10px] text-gray-600 font-black uppercase tracking-widest mb-1 group-hover:text-[#f59e0b] transition-colors">Tracked Tokens</div><div className="text-2xl font-black text-white">{filteredWhalesData.length}</div></div>
+                </div>
+                <div className="flex items-center gap-6">
+                  {lastUpdated && <div className="text-[10px] text-gray-600 font-bold flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] animate-pulse" />SYNCED {lastUpdated.toLocaleTimeString()}</div>}
+                  <button onClick={fetchWhalesData} disabled={whalesLoading} className="group relative bg-white text-black px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.2)]"><span className="relative z-10 flex items-center gap-2">{whalesLoading ? "Syncing..." : "Refresh"}<RefreshCw className={`w-3 h-3 ${whalesLoading ? 'animate-spin' : ''}`} /></span></button>
+                </div>
+              </div>
+              <AnimatePresence>
+                {whalesError && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3"><Info className="w-5 h-5 text-red-500" /><p className="text-red-500/90 text-xs font-bold uppercase tracking-wider">{whalesError}</p></motion.div>}
+              </AnimatePresence>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {whalesLoading && whalesData.length === 0 ? [...Array(8)].map((_, i) => <div key={i} className="h-[380px] bg-[#111]/50 border border-[#222] rounded-[2rem] animate-pulse" />) : (
+                  <AnimatePresence mode="popLayout">{filteredWhalesData.map((token) => <WhalesCard key={token.id} token={token} />)}</AnimatePresence>
+                )}
+              </div>
+              {!whalesLoading && filteredWhalesData.length === 0 && !whalesError && (<div className="text-center py-32 bg-[#111]/30 border border-[#222] rounded-[3rem] border-dashed backdrop-blur-sm"><BarChart3 className="w-12 h-12 text-gray-700 mx-auto mb-4" /><h3 className="text-gray-300 text-lg font-black tracking-tight">No pre-market tokens found</h3><p className="text-gray-500 text-sm mt-2">Try adjusting your search or check back later.</p></div>)}
             </motion.div>
           )}
         </AnimatePresence>
-
-        {activeTab === 'polymarket' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {loading && data.length === 0 ? [...Array(8)].map((_, i) => <div key={i} className="h-[380px] bg-[#111]/50 border border-[#222] rounded-[2rem] animate-pulse" />) : (
-              <AnimatePresence mode="popLayout">{filteredData.map((token) => <TokenCard key={token.id} token={token} onShowTGE={setSelectedTGE} onShowFDV={setSelectedFDV} />)}</AnimatePresence>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'hyperliquid' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {hlLoading && hlData.length === 0 ? [...Array(8)].map((_, i) => <div key={i} className="h-[380px] bg-[#111]/50 border border-[#222] rounded-[2rem] animate-pulse" />) : (
-              <AnimatePresence mode="popLayout">{filteredHlData.map((token) => <HyperliquidCard key={token.name} token={token} />)}</AnimatePresence>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'whales' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {whalesLoading && whalesData.length === 0 ? [...Array(8)].map((_, i) => <div key={i} className="h-[380px] bg-[#111]/50 border border-[#222] rounded-[2rem] animate-pulse" />) : (
-              <AnimatePresence mode="popLayout">{filteredWhalesData.map((token) => <WhalesCard key={token.id} token={token} />)}</AnimatePresence>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'polymarket' && !loading && filteredData.length === 0 && !error && (<div className="text-center py-32 bg-[#111]/30 border border-[#222] rounded-[3rem] border-dashed backdrop-blur-sm"><BarChart3 className="w-12 h-12 text-gray-700 mx-auto mb-4" /><h3 className="text-gray-300 text-lg font-black tracking-tight">No active markets detected</h3><p className="text-gray-500 text-sm mt-2">Try adjusting your search or check back later.</p></div>)}
-        {activeTab === 'hyperliquid' && !hlLoading && filteredHlData.length === 0 && !hlError && (<div className="text-center py-32 bg-[#111]/30 border border-[#222] rounded-[3rem] border-dashed backdrop-blur-sm"><BarChart3 className="w-12 h-12 text-gray-700 mx-auto mb-4" /><h3 className="text-gray-300 text-lg font-black tracking-tight">No active pre-launch perps detected</h3><p className="text-gray-500 text-sm mt-2">Try adjusting your search or check back later.</p></div>)}
-        {activeTab === 'whales' && !whalesLoading && filteredWhalesData.length === 0 && !whalesError && (<div className="text-center py-32 bg-[#111]/30 border border-[#222] rounded-[3rem] border-dashed backdrop-blur-sm"><BarChart3 className="w-12 h-12 text-gray-700 mx-auto mb-4" /><h3 className="text-gray-300 text-lg font-black tracking-tight">No pre-market tokens found</h3><p className="text-gray-500 text-sm mt-2">Try adjusting your search or check back later.</p></div>)}
 
         <AnimatePresence>
           {selectedTGE && <TGEChartModal token={selectedTGE} onClose={() => setSelectedTGE(null)} />}
