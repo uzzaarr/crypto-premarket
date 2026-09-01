@@ -18,6 +18,7 @@ import {
   ChevronDown,
   Calculator as CalculatorIcon,
 } from "lucide-react";
+import { Analytics } from '@vercel/analytics/react';
 
 interface Market {
   question: string;
@@ -905,6 +906,7 @@ export default function App() {
           {selectedFDV && <FDVChartModal token={selectedFDV} onClose={() => setSelectedFDV(null)} />}
         </AnimatePresence>
       </div>
+      <Analytics />
     </div>
   );
 }
